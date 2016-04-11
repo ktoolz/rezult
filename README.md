@@ -24,14 +24,16 @@ Also, our main goal for that framework is for it to be the easiest possible to u
 Add this repository in your Maven pom.xml:
 
 ```xml
-<repository>
-    <snapshots>
-        <enabled>false</enabled>
-    </snapshots>
-    <id>bintray-ktoolz-maven</id>
-    <name>bintray</name>
-    <url>http://dl.bintray.com/ktoolz/maven</url>
-</repository>
+<repositories>
+    <repository>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+        <id>central</id>
+        <name>bintray</name>
+        <url>http://jcenter.bintray.com</url>
+    </repository>
+</repositories>
 ```
 
 And then this dependency:
