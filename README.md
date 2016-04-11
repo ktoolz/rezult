@@ -1,8 +1,52 @@
 # rezult
 
-[![Kotlin](https://img.shields.io/badge/kotlin-1.0.1-blue.svg)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-1.0.1-blue.svg)](http://kotlinlang.org) [ ![Download](https://api.bintray.com/packages/ktoolz/maven/rezult/images/download.svg) ](https://bintray.com/ktoolz/maven/rezult/_latestVersion) [![Build Status](https://travis-ci.org/ktoolz/rezult.svg?branch=master)](https://travis-ci.org/ktoolz/rezult)
 
 Just a simple framework for wrapping return types into a single object: `Result`.
+
+## Inspiration
+
+We got inspiration for that framework from:
+
+* the [Try](http://www.javaslang.io/javaslang-docs/#_try) feature from [javaslang](http://www.javaslang.io/),
+* the [Result](https://github.com/kittinunf/Result) Kotlin framework produced by [@kittinunf](https://github.com/kittinunf),
+
+## Target
+
+The goal of that framework is to use a single output for each and every method we write: `Result`.
+
+That wrapper will allow to indicate either the response of a method is a success or a failure, and will allow to act on that result.
+
+Also, our main goal for that framework is for it to be the easiest possible to use.
+
+## Download
+
+Add this repository in your Maven pom.xml:
+
+```xml
+<repository>
+    <snapshots>
+        <enabled>false</enabled>
+    </snapshots>
+    <id>bintray-ktoolz-maven</id>
+    <name>bintray</name>
+    <url>http://dl.bintray.com/ktoolz/maven</url>
+</repository>
+```
+
+And then this dependency:
+
+```xml
+<dependency>
+    <groupId>com.github.ktoolz</groupId>
+    <artifactId>rezult</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+## Examples
+
+Want to see rezult in action? Just have a look at our [Spek tests](https://github.com/ktoolz/rezult/blob/master/src/test/kotlin/com/github/ktoolz/rezult/ResultSpecs.kt) to get examples of all the features included in rezult.
 
 ## License
 
