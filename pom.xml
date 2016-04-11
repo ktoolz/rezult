@@ -4,7 +4,7 @@
 
     <groupId>com.github.ktoolz</groupId>
     <artifactId>rezult</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <name>Rezult</name>
     <description>A simple Kotlin framework for wrapping return types into Results.</description>
@@ -35,7 +35,7 @@
         <connection>scm:git:https://github.com/ktoolz/rezult.git</connection>
         <developerConnection>scm:git:https://github.com/ktoolz/rezult.git</developerConnection>
         <url>https://github.com/ktoolz/rezult</url>
-        <tag>rezult-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <licenses>
