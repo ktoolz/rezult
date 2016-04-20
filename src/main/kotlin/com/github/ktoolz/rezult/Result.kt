@@ -18,37 +18,51 @@ import com.github.ktoolz.rezult.exceptions.ResultException
 // ----------------------------------------------------------------
 
 /**
+ * Property extension on lambdas with no parameters.
+ *
+ * Provides the same lambda but returning a [Result] of the original return type.
+ */
+val <T> (() -> T).lambdaresult: () -> Result<T> get() = { Result.of(this) }
+
+/**
+ * Property extension on lambdas with no parameters.
+ *
+ * Provides a [Result] containing the value returned by the lambda execution.
+ */
+val <T> (() -> T).result: Result<T> get() = Result.of(this)
+
+/**
  * Extension on lambdas with no parameters.
  *
- * Provides a [Result] out of the lambda.
+ * Provides a [Result] containing the value returned by the lambda execution.
  */
-val <T> (() -> T).result: () -> Result<T> get() = { Result.of(this) }
+fun <T> (() -> T).toResult(): Result<T> = Result.of(this)
 
 /**
- * Extension on lambdas with one parameter.
+ * Property extension on lambdas with one parameter.
  *
- * Provides a [Result] out of the lambda.
+ * Provides the same lambda but returning a [Result] of the original return type.
  */
-val <T, A> ((A) -> T).result: (A) -> Result<T> get() = { a -> Result.of({ this(a) }) }
+val <T, A> ((A) -> T).lambdaresult: (A) -> Result<T> get() = { a -> Result.of({ this(a) }) }
 
 /**
- * Extension on lambdas with two parameters.
+ * Property extension on lambdas with two parameters.
  *
- * Provides a [Result] out of the lambda.
+ * Provides the same lambda but returning a [Result] of the original return type.
  */
 val <T, A, B> ((A, B) -> T).result: (A, B) -> Result<T> get() = { a, b -> Result.of({ this(a, b) }) }
 
 /**
- * Extension on lambdas with three parameters.
+ * Property extension on lambdas with three parameters.
  *
- * Provides a [Result] out of the lambda.
+ * Provides the same lambda but returning a [Result] of the original return type.
  */
 val <T, A, B, C> ((A, B, C) -> T).result: (A, B, C) -> Result<T> get() = { a, b, c -> Result.of({ this(a, b, c) }) }
 
 /**
- * Extension on lambdas with four parameters.
+ * Property extension on lambdas with four parameters.
  *
- * Provides a [Result] out of the lambda.
+ * Provides the same lambda but returning a [Result] of the original return type.
  */
 val <T, A, B, C, D> ((A, B, C, D) -> T).result: (A, B, C, D) -> Result<T> get() = { a, b, c, d ->
     Result.of({ this(a, b, c, d) })
@@ -103,15 +117,13 @@ fun <T> T.validate(errorMessage: String = "Validation error", validator: T.() ->
 operator fun Result<Boolean>.not() = onSuccess { Result.success(!it) }
 
 /**
- * Extension on integer [Result].
+ * Extension on boolean [Result].
  *
- * Allows to add integer [Result] directly by using the `+` operator. Will keep the [Result] status (failures won't change).
+ * Allows to check if a boolean [Result] is true or not. If it's true, it'll return the same result. Otherwise it'll return a failure.
  *
- * @param[value] the value to be added to the [Result].
- *
- * @return a [Result] object containing the sum of its value and provided parameter (if success), or the same failure [Result].
+ * @return the same [Result] object if the boolean is true, a failure otherwise.
  */
-operator fun Result<Int>.plus(value: Int) = onSuccess { Result.success(it + value) }
+fun Result<Boolean>.isTrue() = validate { this }
 
 /**
  * Extension on [IntRange] for [Result].
@@ -188,6 +200,22 @@ sealed class Result<T> {
      * @return the same [Result] you had in a first time.
      */
     fun logSuccess(operation: T.() -> Unit): Result<T> = withSuccess { this@Result.apply { operation() } }
+
+    /**
+     * Tries to execute an operation which returns a new [Result] on a [Success] result.
+     * It'll return the same first [Result] object if the operation is ok, but it'll return a failure if the operation returned a failed result.
+     *
+     * @param[operation] an operation to be applied on the [Result] value, returning a new [Result]. The result of this operation will be used in order to check if we should return the same object or not.
+     *
+     * @return the same [Result] if the operation is successful, or a failure if the operation result isn't a success.
+     */
+    fun <U> tryWithSuccess(operation: T.() -> Result<U>): Result<T> = withSuccess {
+        val result = operation()
+        when (result) {
+            is Success -> this@Result
+            else -> result as Result<T> // It's a failure so we don't care about the cast since it'll never happen
+        }
+    }
 
     // ----------------------------------------------------------------
     // Failure operations

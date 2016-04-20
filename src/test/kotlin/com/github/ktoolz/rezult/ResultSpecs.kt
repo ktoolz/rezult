@@ -136,6 +136,20 @@ class ResultSpecs : Spek() { init {
                 assertThat(stringValidation).isEqualTo("Failure[${ResultException::class.java}]")
             }
         }
+        on ("Trying a successful operation on the result") {
+            val trySuccess = success.tryWithSuccess { (this.length > 0).toResult() }
+            it("should return the exact same result object we had in a first time") {
+                assertThat(trySuccess).isEqualTo(success)
+            }
+        }
+        on ("Trying an unsuccessful operation on the result") {
+            val trySuccess = success.tryWithSuccess { (this.length < 0).toResult().validate { this } }
+            val isFailure = trySuccess.isFailure()
+            it("should return a new failure object") {
+                assertThat(trySuccess).isNotEqualTo(success)
+                assertThat(isFailure).isTrue()
+            }
+        }
     }
 
     given("A Failure result created by hand from a message") {
@@ -357,22 +371,6 @@ class ResultSpecs : Spek() { init {
                 assertThat(contained).isFalse()
             }
         }
-        on("Adding a value on a successful result") {
-            val addition = result + 10
-            val additionSuccess = addition.isSuccess()
-            val resultAddition = addition or 0
-            it("should return a result containing the addition of the first result value and the value we provide") {
-                assertThat(additionSuccess).isTrue()
-                assertThat(resultAddition).isEqualTo(20)
-            }
-        }
-        on("Adding a value on a failed result") {
-            val addition = failed + 10
-            val additionFailure = addition.isFailure()
-            it("should return a failure result") {
-                assertThat(additionFailure).isTrue()
-            }
-        }
     }
 
     given("A result of a Boolean") {
@@ -392,6 +390,21 @@ class ResultSpecs : Spek() { init {
             val negationFailure = negation.isFailure()
             it("should return a failure result, since we already had a failure") {
                 assertThat(negationFailure).isTrue()
+            }
+        }
+        on("Checking if the true boolean result is true") {
+            val trueCheck = result.isTrue()
+            it("should return the exact same result we already have") {
+                assertThat(result).isEqualTo(trueCheck)
+            }
+        }
+        val falseResult = false.toResult()
+        on("Checking if a false boolean result is true") {
+            val falseCheck = falseResult.isTrue()
+            val isFailure = falseCheck.isFailure()
+            it("should return a failure object") {
+                assertThat(falseCheck).isNotEqualTo(result)
+                assertThat(isFailure).isTrue()
             }
         }
     }
