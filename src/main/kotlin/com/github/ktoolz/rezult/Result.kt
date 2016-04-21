@@ -12,6 +12,7 @@
 package com.github.ktoolz.rezult
 
 import com.github.ktoolz.rezult.exceptions.ResultException
+import java.util.function.Consumer
 
 // ----------------------------------------------------------------
 // Property extensions for lambdas to retrieve results
@@ -100,6 +101,7 @@ fun <T : Exception> T.toResult() = Result.failure<Any>(this)
  *
  * @return a [Result] object containing the result of the validation.
  */
+@JvmOverloads
 fun <T> T.validate(errorMessage: String = "Validation error", validator: T.() -> Boolean): Result<T> =
         toResult().validate(errorMessage, validator)
 
@@ -199,7 +201,13 @@ sealed class Result<T> {
      *
      * @return the same [Result] you had in a first time.
      */
+    @JvmName("_logSuccessKotlin")
     fun logSuccess(operation: T.() -> Unit): Result<T> = withSuccess { this@Result.apply { operation() } }
+
+    /**
+     * Same as [logSuccess(operation: T.() -> Unit): Result<T>] but with a more java friendly object
+     */
+    fun logSuccess(operation: Consumer<T>): Result<T> = withSuccess { this@Result.apply { operation.accept(this@withSuccess) } }
 
     /**
      * Tries to execute an operation which returns a new [Result] on a [Success] result.
@@ -248,7 +256,13 @@ sealed class Result<T> {
      *
      * @return the same [Result] you had in a first time.
      */
+    @JvmName("_logFailureKotlin")
     fun logFailure(operation: Exception.() -> Unit): Result<T> = withFailure { this@Result.apply { operation() } }
+
+    /**
+     * Same as [logFailure(operation: Exception.() -> Unit): Result<T>] but with a more java friendly object
+     */
+    fun logFailure(operation: Consumer<Exception>): Result<T> = withFailure { this@Result.apply { operation.accept(this@withFailure) } }
 
     // ----------------------------------------------------------------
     // Common operations
@@ -264,6 +278,7 @@ sealed class Result<T> {
      *
      * @return the same [Result] if the validation was ok, or a new [Result] failure if the validation was not ok.
      */
+    @JvmOverloads
     fun validate(errorMessage: String = "Validation error", validator: T.() -> Boolean): Result<T> =
             withSuccess {
                 if ( this.validator()) this@Result
@@ -332,6 +347,7 @@ sealed class Result<T> {
          *
          * @return a [Success] object containing the provided [value].
          */
+        @JvmStatic
         fun <T> success(value: T): Result<T> = Success(value)
 
         /**
@@ -341,6 +357,7 @@ sealed class Result<T> {
          *
          * @return a [Failure] object containing the provided [exception].
          */
+        @JvmStatic
         fun <T> failure(exception: Exception): Result<T> = Failure(exception)
 
         /**
@@ -350,6 +367,7 @@ sealed class Result<T> {
          *
          * @return a [Failure] object containing a [ResultException] using the provided [message].
          */
+        @JvmStatic
         fun <T> failure(message: String): Result<T> = Failure(ResultException(message))
 
         // ----------------------------------------------------------------
@@ -365,6 +383,7 @@ sealed class Result<T> {
          *
          * @return a [Success] object containing the result of the [operation] if there's no [Exception] raised. Otherwise it'll return a [Failure] containing that [Exception].
          */
+        @JvmStatic
         fun <T> of(operation: () -> T): Result<T> {
             try {
                 return Success(operation())
@@ -380,6 +399,7 @@ sealed class Result<T> {
          *
          * @return the first [Success] coming for the [actions] execution, a [Failure] if none of the [actions] creates a [Success].
          */
+        @JvmStatic
         fun <T> chain(vararg actions: () -> Result<T>): Result<T> {
             actions.forEach { action ->
                 val result = action()
