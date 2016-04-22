@@ -42,8 +42,64 @@ And then this dependency:
 <dependency>
     <groupId>com.github.ktoolz</groupId>
     <artifactId>rezult</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
 </dependency>
+```
+
+## TL;DR
+
+`Result` allows you to wrap any code execution in order to catch the Exceptions you might encounter and retrieve a Failure instead:
+
+### In Kotlin
+
+```kotlin
+    // Computing a Result and chaining operations:
+    val res = Result.of { operation() }
+        .logSuccess { println("It Worked!") }
+        .logFailure { println("It Failed!") }
+        .validate { this.length > 0 }
+        .logFailure { println("Size isn't good.") }
+        .withSuccess { register(this) }
+        .onFailure { rollback(it) }
+
+    // Checking a Result in your code
+    when  {
+        res.isSuccess() -> println("Success!")
+        res.isFailure() -> println("Failure!")
+        res.contains("Hello") -> println("Correct content!")
+    }
+
+    // Retrieving the value of a Result
+    var value = res or "Default value"
+    // You can also write it:
+    value = res.getOrElse { "Default value" }
+```
+
+### In Java
+
+```java
+        // Computing a Result and chaining operations:
+        Result<String> res = Result.of(() -> operation())
+                                   .logSuccess($ -> System.out.println("It Worked!"))
+                                   .logFailure($ -> System.out.println("It Failed!"))
+                                   .validate(s -> s.length() > 0)
+                                   .logFailure($ -> System.out.println("Size isn't good."))
+                                   .withSuccess(s -> register(s))
+                                   .onFailure(e -> rollback(e));
+
+        // Checking a Result in your code
+        if(res.isSuccess()) {
+            System.out.println("Success!");
+        } else if(res.isFailure()) {
+            System.out.println("Failure!");
+        } else if(res.contains("Hello")) {
+            System.out.println("Correct content!")
+        }
+
+        // Retrieving the value of a Result
+        String value = res.or("Default value");
+        // You can also write it:
+        value = res.getOrElse("Default value");
 ```
 
 ## Examples
