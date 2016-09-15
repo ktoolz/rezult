@@ -15,6 +15,7 @@ import com.github.ktoolz.rezult.exceptions.ResultException
 import org.assertj.core.api.Assertions.assertThat
 import org.jetbrains.spek.api.Spek
 
+@Suppress("DIVISION_BY_ZERO")
 /**
  * Spek tests for [Result].
  *
@@ -335,14 +336,19 @@ class ResultSpecs : Spek() { init {
                 assertThat(valueResult).isEqualTo("NEVER")
             }
         }
-        on("Chaining failed operations after a successful one") {
+        on("Chaining operations after a successful one") {
             var called = false
             fun failed2() = Result.of {
                 called = true
                 "${1 / 0}"
             }
 
-            val result = Result.chain(::success1, ::failed2)
+            fun success2() = Result.of {
+                called = true
+                "GGWP for the Rick Roll"
+            }
+
+            val result = Result.chain(::success1, ::success2, ::failed2)
             it("should return the first success and shouldn't call then next operations") {
                 assertThat(result).isEqualToComparingFieldByField(success1())
                 assertThat(called).isFalse()
