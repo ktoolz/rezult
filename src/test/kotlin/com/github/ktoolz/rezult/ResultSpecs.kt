@@ -138,7 +138,7 @@ class ResultSpecs : Spek() { init {
             }
         }
         on ("Trying a successful operation on the result") {
-            val trySuccess = success.tryWithSuccess { (this.length > 0).toResult() }
+            val trySuccess = success.tryWithSuccess { (this.isNotEmpty()).toResult() }
             it("should return the exact same result object we had in a first time") {
                 assertThat(trySuccess).isEqualTo(success)
             }
@@ -310,6 +310,7 @@ class ResultSpecs : Spek() { init {
         fun success3() = Result.of { "GIVE" }
         fun success4() = Result.of { "YOU" }
         fun success5() = Result.of { "UP" }
+
         on("Chaining only successful operations") {
             val result = Result.chain(::success1, ::success2, ::success3, ::success4, ::success5)
             val valueResult = result or backup
@@ -418,7 +419,7 @@ class ResultSpecs : Spek() { init {
     given("An exception object, whatever it is") {
         val exception = Exception("HELLO")
         on("Calling the Result builder on it") {
-            val result = exception.toResult()
+            val result: Result<String> = exception.toResult()
             val resultFailure = result.isFailure()
             var e = Exception()
             result.logFailure { e = this }

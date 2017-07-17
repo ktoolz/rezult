@@ -92,7 +92,7 @@ fun <T> T.toResult() = Result.success(this)
  *
  * @return a [Result] object (failure) linked to this [Exception].
  */
-fun <T : Exception> T.toResult() = Result.failure<Any>(this)
+fun <T : Exception, V> T.toResult() = Result.failure<V>(this)
 
 /**
  * Extension on any type.
