@@ -294,7 +294,7 @@ class ResultSpecs : Spek() { init {
             }
         }
         on("Checking the cause of the failure") {
-            var exception = Exception()
+            var exception = Throwable()
             result.logFailure { exception = this }
             it("should assert the Exception is a ") {
                 assertThat(exception).isInstanceOf(ArithmeticException::class.java)
@@ -322,7 +322,7 @@ class ResultSpecs : Spek() { init {
         on("Chaining only failed operations") {
             val result = Result.chain(::failed, ::failed, ::failed, ::failed)
             val resultFailure = result.isFailure()
-            var exception = Exception()
+            var exception = Throwable()
             result.logFailure { exception = this }
             it("should return a new failure with ResultException") {
                 assertThat(resultFailure).isTrue()
@@ -421,7 +421,7 @@ class ResultSpecs : Spek() { init {
         on("Calling the Result builder on it") {
             val result: Result<String> = exception.toResult()
             val resultFailure = result.isFailure()
-            var e = Exception()
+            var e = Throwable()
             result.logFailure { e = this }
             it("should create a failure result containing that exception") {
                 assertThat(resultFailure).isTrue()
@@ -453,7 +453,7 @@ class ResultSpecs : Spek() { init {
         on("Calling a failed validation on that object") {
             val result = obj.validate { false }
             val resultFailure = result.isFailure()
-            var exception = Exception()
+            var exception = Throwable()
             result.logFailure { exception = this }
             it("should create a failure result containing a ResultException") {
                 assertThat(resultFailure).isTrue()
