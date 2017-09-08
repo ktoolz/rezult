@@ -247,7 +247,7 @@ sealed class Result<T> {
      *
      * @return the [Result] coming from the operation applied to this [Result] exception.
      */
-    abstract fun onFailure(operation: (Exception) -> Result<T>): Result<T>
+    abstract fun onFailure(operation: (Throwable) -> Result<T>): Result<T>
 
     /**
      * Executes an operation on a Failure exception, as if we had a `with (failure)`, and returns a new [Result] containing that operation's response.
@@ -256,7 +256,7 @@ sealed class Result<T> {
      *
      * @return the [Result] coming from the operation applied to this [Result] exception.
      */
-    fun withFailure(operation: Exception.() -> Result<T>) = onFailure(operation)
+    fun withFailure(operation: Throwable.() -> Result<T>) = onFailure(operation)
 
     /**
      * Executes a log operation (returning nothing) on a Failure exception.
@@ -266,12 +266,12 @@ sealed class Result<T> {
      * @return the same [Result] you had in a first time.
      */
     @JvmName("_logFailureKotlin")
-    fun logFailure(operation: Exception.() -> Unit): Result<T> = withFailure { this@Result.apply { operation() } }
+    fun logFailure(operation: Throwable.() -> Unit): Result<T> = withFailure { this@Result.apply { operation() } }
 
     /**
      * Same as [logFailure(operation: Exception.() -> Unit): Result<T>] but with a more java friendly object
      */
-    fun logFailure(operation: Consumer<Exception>): Result<T> = withFailure {
+    fun logFailure(operation: Consumer<Throwable>): Result<T> = withFailure {
         this@Result.apply {
             operation.accept(this@withFailure)
         }
@@ -371,7 +371,7 @@ sealed class Result<T> {
          * @return a Failure object containing the provided [exception].
          */
         @JvmStatic
-        fun <T> failure(exception: Exception): Result<T> = Failure(exception)
+        fun <T> failure(exception: Throwable): Result<T> = Failure(exception)
 
         /**
          * Creates a Failure result from a message. It'll internally wrap that message in a [ResultException].
@@ -453,7 +453,7 @@ sealed class Result<T> {
         /**
          * @see [Result.onFailure].
          */
-        override fun onFailure(operation: (Exception) -> Result<T>): Result<T> = this
+        override fun onFailure(operation: (Throwable) -> Result<T>): Result<T> = this
 
         /**
          * @see [Result.getOrElse].
@@ -484,7 +484,7 @@ sealed class Result<T> {
      *
      * @see [Result].
      */
-    private class Failure<T>(val failure: Exception) : Result<T>() {
+    private class Failure<T>(val failure: Throwable) : Result<T>() {
 
         /**
          * @see [Result.isSuccess].
@@ -499,7 +499,7 @@ sealed class Result<T> {
         /**
          * @see [Result.onFailure].
          */
-        override fun onFailure(operation: (Exception) -> Result<T>): Result<T> =
+        override fun onFailure(operation: (Throwable) -> Result<T>): Result<T> =
                 try {
                     operation(failure)
                 } catch (e: Exception) {
